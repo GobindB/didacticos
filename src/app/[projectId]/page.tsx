@@ -1,10 +1,18 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Folder, Clock, AlertCircle, FileText } from "lucide-react";
 import { projects } from "@/lib/mockData";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+
+interface Task {
+  id: number;
+  title: string;
+  status: string;
+  time: string;
+  contractor: string;
+  critical: boolean;
+}
 
 function StatusBadge({ status }: { status: string }) {
   const color =
@@ -79,12 +87,12 @@ export default function ProjectDetailPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <Folder className="w-5 h-5 text-blue-500" />
-              Today's Tasks
+              Today&apos;s Tasks
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-2">
-              {project.todayTasks?.map((task: any) => (
+              {project.todayTasks?.map((task: Task) => (
                 <div
                   key={task.id}
                   className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors group
@@ -119,10 +127,10 @@ export default function ProjectDetailPage() {
             {/* Summary Stats */}
             <div className="mt-4 pt-4 border-t border-slate-700 flex items-center justify-between text-sm text-slate-400">
               <span>
-                {project.todayTasks?.filter((t: any) => t.critical).length} critical tasks
+                {project.todayTasks?.filter((t: Task) => t.critical).length} critical tasks
               </span>
               <span>
-                {project.todayTasks?.filter((t: any) => t.status === 'completed').length} completed
+                {project.todayTasks?.filter((t: Task) => t.status === 'completed').length} completed
               </span>
             </div>
           </CardContent>

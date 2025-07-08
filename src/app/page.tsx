@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Folder, Clock, AlertCircle, CheckCircle2, Circle, FileText, ChevronRight } from "lucide-react";
+import { Folder } from "lucide-react";
 import { projects } from "@/lib/mockData";
 import { useRouter } from "next/navigation";
 
@@ -18,12 +16,6 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`px-2 py-0.5 rounded text-xs font-medium ${color}`}>{status}</span>
   );
-}
-
-function TaskStatusIcon({ status }: { status: string }) {
-  if (status === "completed") return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-  if (status === "in-progress") return <Circle className="w-4 h-4 text-amber-500 fill-current" />;
-  return <Circle className="w-4 h-4 text-slate-300" />;
 }
 
 function ProjectList() {

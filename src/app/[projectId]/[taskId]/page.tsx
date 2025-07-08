@@ -1,11 +1,19 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { projects } from "@/lib/mockData";
 
 function truncate(str: string, max: number) {
   return str.length > max ? str.slice(0, max - 1) + "…" : str;
+}
+
+interface Task {
+  id: number;
+  title: string;
+  status: string;
+  time: string;
+  contractor: string;
+  critical: boolean;
 }
 
 export default function TaskDetailPage() {
@@ -14,7 +22,7 @@ export default function TaskDetailPage() {
   const projectId = params.projectId;
   const taskId = params.taskId;
   const project = projects.find((p) => String(p.id) === String(projectId));
-  const task = project?.todayTasks?.find((t: any) => String(t.id) === String(taskId));
+  const task = project?.todayTasks?.find((t: Task) => String(t.id) === String(taskId));
 
   // Fallbacks for missing data
   const projectName = project ? truncate(project.name, 22) : "Project";
