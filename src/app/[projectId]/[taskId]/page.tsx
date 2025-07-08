@@ -2,6 +2,8 @@
 import { useRouter, useParams } from "next/navigation";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { projects } from "@/lib/mockData";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 function truncate(str: string, max: number) {
   return str.length > max ? str.slice(0, max - 1) + "…" : str;
@@ -14,6 +16,32 @@ interface Task {
   time: string;
   contractor: string;
   critical: boolean;
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "completed":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "in-progress":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "pending":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
+  }
+}
+
+function getStatusLabel(status: string) {
+  switch (status) {
+    case "completed":
+      return "Completed";
+    case "in-progress":
+      return "In Progress";
+    case "pending":
+      return "Pending";
+    default:
+      return "Unknown";
+  }
 }
 
 export default function TaskDetailPage() {
@@ -29,18 +57,98 @@ export default function TaskDetailPage() {
   const taskTitle = task ? truncate(task.title, 16) : "Task";
 
   return (
-    <div className="flex flex-col min-h-screen p-8">
-      <BreadcrumbNav
-        segments={[
-          { label: "Projects", href: "/" },
-          { label: projectName, href: `/${projectId}` },
-          { label: taskTitle }
-        ]}
-        onBack={() => router.push(`/${projectId}`)}
-      />
-      {/* Main content placeholder */}
-      <div className="w-full h-96 bg-slate-900 rounded-lg flex items-center justify-center text-slate-500 text-xl">
-        Task detail content goes here
+    <div className="flex flex-col h-screen">
+      {/* BreadcrumbNav at the top, not padded */}
+      <div className="px-8 pt-6 pb-2">
+        <BreadcrumbNav
+          segments={[
+            { label: "Projects", href: "/" },
+            { label: projectName, href: `/${projectId}` },
+            { label: taskTitle }
+          ]}
+          onBack={() => router.push(`/${projectId}`)}
+        />
+      </div>
+      {/* Main content fills the rest of the screen */}
+      <div className="flex flex-1 gap-6 px-8 pb-6 h-0 min-h-0">
+        {/* Left Column - Task Detail Card */}
+        <div className="w-80 flex-shrink-0 h-full">
+          <Card className="h-full flex flex-col">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-xl font-semibold">
+                    {task?.title || "Task Not Found"}
+                  </CardTitle>
+                  <CardDescription className="mt-2">
+                    {project?.name}
+                  </CardDescription>
+                </div>
+                {task?.critical && (
+                  <Badge variant="destructive" className="ml-2">
+                    Critical
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 space-y-6 overflow-y-auto">
+              {/* Task Status */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Status</h3>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(task?.status || "pending")}`}>
+                  {getStatusLabel(task?.status || "pending")}
+                </div>
+              </div>
+              {/* Task Details */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Scheduled Time</h3>
+                  <p className="text-sm text-gray-900">{task?.time || "Not scheduled"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Contractor</h3>
+                  <p className="text-sm text-gray-900">{task?.contractor || "Unassigned"}</p>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500 mb-1">Task ID</h3>
+                  <p className="text-sm text-gray-900">#{task?.id || "N/A"}</p>
+                </div>
+              </div>
+              {/* Project Context */}
+              <div className="pt-4 border-t">
+                <h3 className="text-sm font-medium text-gray-500 mb-2">Project Context</h3>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {project?.description || "No project description available."}
+                </p>
+              </div>
+              {/* Sentinel Use Case */}
+              {project?.sentinelUseCase && (
+                <div className="pt-4 border-t">
+                  <h3 className="text-sm font-medium text-gray-500 mb-2">Sentinel Use Case</h3>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {project.sentinelUseCase}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        {/* Right Column - Main Content Area */}
+        <div className="flex-1 h-full min-w-0">
+          <Card className="h-full flex flex-col">
+            <CardHeader>
+              <CardTitle>Task Actions & Updates</CardTitle>
+              <CardDescription>
+                Manage task progress and view related information
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col">
+              <div className="flex-1 w-full bg-slate-900 rounded-lg flex items-center justify-center text-slate-500 text-xl">
+                Task actions and updates content goes here
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
