@@ -4,6 +4,7 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { projects } from "@/lib/mockData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 function truncate(str: string, max: number) {
   return str.length > max ? str.slice(0, max - 1) + "…" : str;
@@ -55,6 +56,12 @@ export default function TaskDetailPage() {
   // Fallbacks for missing data
   const projectName = project ? truncate(project.name, 22) : "Project";
   const taskTitle = task ? truncate(task.title, 16) : "Task";
+
+  // State for AI plan confirmation/editing
+  const [planConfirmed, setPlanConfirmed] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(false);
+  const [planText, setPlanText] = useState(project?.sentinelUseCase || "");
+  const [planDraft, setPlanDraft] = useState(planText);
 
   return (
     <div className="flex flex-col h-screen">
@@ -134,20 +141,84 @@ export default function TaskDetailPage() {
           </Card>
         </div>
         {/* Right Column - Main Content Area */}
-        <div className="flex-1 h-full min-w-0">
-          <Card className="h-full flex flex-col">
-            <CardHeader>
-              <CardTitle>Task Actions & Updates</CardTitle>
-              <CardDescription>
-                Manage task progress and view related information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 flex flex-col">
-              <div className="flex-1 w-full bg-slate-900 rounded-lg flex items-center justify-center text-slate-500 text-xl">
-                Task actions and updates content goes here
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex-1 h-full min-w-0 flex flex-col gap-4">
+          {/* AI Agent Resolution Plan Card (shown until confirmed) */}
+          {!planConfirmed && (
+            <Card className="mb-2">
+              <CardHeader>
+                <CardTitle>AI Agent Resolution Plan</CardTitle>
+                <CardDescription>
+                  Review and confirm the AI agent's proposed resolution plan for this task.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {editingPlan ? (
+                  <div className="flex flex-col gap-3">
+                    <textarea
+                      className="w-full min-h-[100px] rounded-md border bg-background p-2 text-sm text-foreground"
+                      value={planDraft}
+                      onChange={e => setPlanDraft(e.target.value)}
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        className="px-4 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/80"
+                        onClick={() => {
+                          setPlanText(planDraft);
+                          setEditingPlan(false);
+                        }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        className="px-4 py-1 rounded border border-gray-400 text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setPlanDraft(planText);
+                          setEditingPlan(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm text-gray-100 mb-4 whitespace-pre-line">{planText}</p>
+                    <div className="flex gap-2">
+                      <button
+                        className="px-4 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/80"
+                        onClick={() => setPlanConfirmed(true)}
+                      >
+                        Confirm Plan
+                      </button>
+                      <button
+                        className="px-4 py-1 rounded border border-gray-400 text-gray-700 hover:bg-gray-100"
+                        onClick={() => setEditingPlan(true)}
+                      >
+                        Edit Plan
+                      </button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          {/* Task Actions & Updates Card (shown after plan is confirmed) */}
+          {planConfirmed && (
+            <Card className="h-full flex flex-col">
+              <CardHeader>
+                <CardTitle>Task Actions & Updates</CardTitle>
+                <CardDescription>
+                  Manage task progress and view related information
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 flex flex-col">
+                <div className="flex-1 w-full bg-slate-900 rounded-lg flex items-center justify-center text-slate-500 text-xl">
+                  Task actions and updates content goes here
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
